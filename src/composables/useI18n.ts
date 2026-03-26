@@ -28,6 +28,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "error.notEnoughPosts": "This user doesn't have enough posts with replies to play the game. Try a more active account.",
     "error.notEnoughReplies": "Not enough posts with visible replies found. Try a more active account.",
     "error.unexpected": "An unexpected error occurred",
+    "app.feedback": "Feedback",
   },
   de: {
     "app.title": "Bluesky Memo",
@@ -47,6 +48,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "error.notEnoughPosts": "Dieser Nutzer hat nicht genug Posts mit Antworten für das Spiel. Versuche einen aktiveren Account.",
     "error.notEnoughReplies": "Nicht genug Posts mit sichtbaren Antworten gefunden. Versuche einen aktiveren Account.",
     "error.unexpected": "Ein unerwarteter Fehler ist aufgetreten",
+    "app.feedback": "Feedback",
   },
   fr: {
     "app.title": "Bluesky Memo",
@@ -66,6 +68,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "error.notEnoughPosts": "Cet utilisateur n'a pas assez de posts avec des réponses pour jouer. Essayez un compte plus actif.",
     "error.notEnoughReplies": "Pas assez de posts avec des réponses visibles. Essayez un compte plus actif.",
     "error.unexpected": "Une erreur inattendue s'est produite",
+    "app.feedback": "Feedback",
   },
   es: {
     "app.title": "Bluesky Memo",
@@ -85,6 +88,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "error.notEnoughPosts": "Este usuario no tiene suficientes publicaciones con respuestas para jugar. Prueba con una cuenta más activa.",
     "error.notEnoughReplies": "No se encontraron suficientes publicaciones con respuestas visibles. Prueba con una cuenta más activa.",
     "error.unexpected": "Ocurrió un error inesperado",
+    "app.feedback": "Feedback",
   },
 }
 
