@@ -22,11 +22,12 @@ export function useBlueskyApi() {
     return data.did
   }
 
-  async function fetchAuthorPosts(actor: string, minPosts = 3): Promise<BskyPost[]> {
+  async function fetchAuthorPosts(actor: string, targetCount: number): Promise<BskyPost[]> {
     const posts: BskyPost[] = []
     let cursor: string | undefined
+    const maxPages = Math.ceil(targetCount / 10)
 
-    for (let page = 0; page < 3; page++) {
+    for (let page = 0; page < maxPages; page++) {
       const params = new URLSearchParams({
         actor,
         filter: "posts_no_replies",
@@ -47,17 +48,17 @@ export function useBlueskyApi() {
 
       posts.push(...filtered)
 
-      if (!data.cursor || posts.length >= minPosts) {
+      if (!data.cursor || posts.length >= targetCount) {
         break
       }
       cursor = data.cursor
     }
 
-    if (posts.length < minPosts) {
+    if (posts.length < 3) {
       throw new Error(t("error.notEnoughPosts"))
     }
 
-    return posts
+    return posts.slice(0, targetCount)
   }
 
   async function fetchReplies(postUri: string): Promise<BskyPost[]> {

@@ -1,18 +1,42 @@
 # Bluesky Memo
 
-A timed matching game built on Bluesky posts. Enter any Bluesky handle, and the app fetches their posts along with the replies to each one. Your job: match every reply to its parent post before the clock runs out.
+A matching game built on Bluesky posts. Enter any Bluesky handle, and the app fetches their posts along with the replies to each one. Your job: match every reply to its parent post.
 
 Repository: https://github.com/vinerima/bsky-memo
 
 ## How it works
 
 1. Enter a Bluesky handle (e.g. `someone.bsky.social`)
-2. The app fetches the user's recent posts (excluding reposts and replies) and their direct replies via the public AT Protocol API
-3. A game page shows 3 root posts on the left and all their replies (shuffled) on the right
-4. Click a root post to select it, then click the replies that belong to it
-5. Each correct match scores 10 points. Wrong picks shake but don't deduct points.
-6. When all replies on a page are matched, the next page loads automatically
-7. The game ends after 120 seconds
+2. Pick a game mode and difficulty
+3. The app fetches the user's recent posts (excluding reposts and replies) and their direct replies via the public AT Protocol API
+4. A game page shows up to 3 root posts on the left and their replies (shuffled, max 3 per post) on the right
+5. Click a root post to select it, then click the replies that belong to it
+6. Each correct match scores 10 points. Each wrong pick costs 5 points.
+7. When all replies on a page are matched, the next page loads automatically
+
+## Game modes
+
+### Time
+
+Race the clock. Score as many correct matches as possible before time runs out.
+
+- Quick -- 1 minute
+- Moderate -- 3 minutes
+- Long -- 5 minutes
+
+### Challenge
+
+Complete a fixed number of posts. No time limit, but mistakes still cost points. Elapsed time is tracked.
+
+- Easy -- 5 posts
+- Medium -- 10 posts
+- Hard -- 25 posts
+- Extreme -- 50 posts
+
+## Scoring
+
+- Correct match: +10 points
+- Wrong match: -5 points (score can go negative)
 
 ## Prerequisites
 
@@ -56,24 +80,26 @@ src/
   App.vue                         Root component, state machine, settings bar
   main.ts                         App entry point
   style.css                       Global styles, CSS custom properties, light/dark theme
-  types.ts                        TypeScript interfaces (BskyPost, GamePage, etc.)
+  types.ts                        TypeScript interfaces, game mode configs, constants
   composables/
     useBlueskyApi.ts              Bluesky public API calls (resolve handle, fetch posts, fetch replies)
-    useGameState.ts               Game engine (timer, scoring, page management, matching logic)
+    useGameState.ts               Game engine (modes, timer, scoring, page management, matching)
     useI18n.ts                    Internationalization (en, de, fr, es)
     useTheme.ts                   Light/dark theme toggle with localStorage persistence
   components/
-    HandleInput.vue               Start screen with handle input
+    HandleInput.vue               Start screen with handle input, mode and difficulty selection
     GameBoard.vue                 Two-column game layout with timer and score
     PostCard.vue                  Individual post card with rich text, images, embeds
-    GameOver.vue                  Final score and play-again screen
+    GameOver.vue                  Final score, stats, and play-again screen
     LoadingSpinner.vue            Loading indicator
 ```
 
 ## Features
 
+- Two game modes: timed and challenge (fixed post count)
 - No authentication required -- uses the public Bluesky API (`public.api.bsky.app`)
 - Posts render with avatars, display names, rich text (links, mentions, hashtags via byte-accurate facet parsing), image thumbnails, external link cards, and engagement counts
+- Max 3 replies per root post to keep the board readable
 - Reposts are filtered out client-side (the API's `posts_no_replies` filter does not exclude them)
 - Reply fetching is batched (5 concurrent requests) to stay within rate limits
 - Light and dark theme with system preference detection and manual toggle

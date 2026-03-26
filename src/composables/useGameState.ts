@@ -1,5 +1,6 @@
 import { ref, computed, onUnmounted } from "vue"
-import type { BskyPost, GamePage, GameState } from "../types"
+import type { BskyPost, GamePage, GameState, GameMode, GameConfig } from "../types"
+import { TIME_LIMITS, CHALLENGE_COUNTS, MAX_REPLIES_PER_POST } from "../types"
 import { useBlueskyApi } from "./useBlueskyApi"
 import { useI18n } from "./useI18n"
 
@@ -43,9 +44,10 @@ export function useGameState() {
   const { t } = useI18n()
 
   const gameState = ref<GameState>("idle")
+  const gameMode = ref<GameMode>("time")
   const handle = ref("")
   const score = ref(0)
-  const timeRemaining = ref(120)
+  const timer = ref(0)
   const pages = ref<GamePage[]>([])
   const currentPageIndex = ref(0)
   const selectedRootUri = ref<string | null>(null)
@@ -53,9 +55,11 @@ export function useGameState() {
   const matchedRootUris = ref<Set<string>>(new Set())
   const error = ref<string | null>(null)
   const totalMatches = ref(0)
+  const totalMistakes = ref(0)
   const wrongSelection = ref<string | null>(null)
 
   let timerInterval: ReturnType<typeof setInterval> | null = null
+  let timeLimit = 0
 
   const currentPage = computed<GamePage | null>(() => pages.value[currentPageIndex.value] ?? null)
 
@@ -70,10 +74,17 @@ export function useGameState() {
     total: pages.value.length,
   }))
 
+  const timeRemaining = computed(() => {
+    if (gameMode.value === "time") {
+      return timeLimit - timer.value
+    }
+    return timer.value
+  })
+
   function startTimer() {
     timerInterval = setInterval(() => {
-      timeRemaining.value--
-      if (timeRemaining.value <= 0) {
+      timer.value++
+      if (gameMode.value === "time" && timer.value >= timeLimit) {
         endGame()
       }
     }, 1000)
@@ -98,22 +109,32 @@ export function useGameState() {
     }
   }
 
-  async function startGame(inputHandle: string) {
+  async function startGame(inputHandle: string, config: GameConfig) {
     error.value = null
     gameState.value = "loading"
+    gameMode.value = config.mode
 
     try {
       const cleaned = inputHandle.replace(/^@/, "").trim()
       handle.value = cleaned
 
+      let targetPostCount: number
+      if (config.mode === "time") {
+        timeLimit = TIME_LIMITS[config.timeDifficulty ?? "quick"]
+        targetPostCount = 50
+      } else {
+        timeLimit = 0
+        targetPostCount = CHALLENGE_COUNTS[config.challengeDifficulty ?? "easy"]
+      }
+
       const did = await api.resolveHandle(cleaned)
-      const rootPosts = await api.fetchAuthorPosts(did)
+      const rootPosts = await api.fetchAuthorPosts(did, targetPostCount)
       const repliesMap = await api.fetchRepliesBatched(rootPosts.map((p) => p.uri))
 
       const postsWithReplies = rootPosts
         .map((root) => ({
           root,
-          replies: repliesMap.get(root.uri) ?? [],
+          replies: shuffle(repliesMap.get(root.uri) ?? []).slice(0, MAX_REPLIES_PER_POST),
         }))
         .filter(({ replies }) => replies.length > 0)
 
@@ -121,11 +142,17 @@ export function useGameState() {
         throw new Error(t("error.notEnoughReplies"))
       }
 
-      pages.value = buildPages(postsWithReplies)
+      const finalPosts =
+        config.mode === "challenge"
+          ? postsWithReplies.slice(0, CHALLENGE_COUNTS[config.challengeDifficulty ?? "easy"])
+          : postsWithReplies
+
+      pages.value = buildPages(finalPosts)
       score.value = 0
-      timeRemaining.value = 120
+      timer.value = 0
       currentPageIndex.value = 0
       totalMatches.value = 0
+      totalMistakes.value = 0
       matchedReplyUris.value = new Set()
       matchedRootUris.value = new Set()
       selectedRootUri.value = null
@@ -174,6 +201,8 @@ export function useGameState() {
         }
       }
     } else {
+      score.value -= 5
+      totalMistakes.value++
       wrongSelection.value = replyUri
       setTimeout(() => {
         wrongSelection.value = null
@@ -187,9 +216,11 @@ export function useGameState() {
       timerInterval = null
     }
     gameState.value = "idle"
+    gameMode.value = "time"
     handle.value = ""
     score.value = 0
-    timeRemaining.value = 120
+    timer.value = 0
+    timeLimit = 0
     pages.value = []
     currentPageIndex.value = 0
     selectedRootUri.value = null
@@ -197,6 +228,7 @@ export function useGameState() {
     matchedRootUris.value = new Set()
     error.value = null
     totalMatches.value = 0
+    totalMistakes.value = 0
     wrongSelection.value = null
   }
 
@@ -208,8 +240,10 @@ export function useGameState() {
 
   return {
     gameState,
+    gameMode,
     handle,
     score,
+    timer,
     timeRemaining,
     pages,
     currentPageIndex,
@@ -218,6 +252,7 @@ export function useGameState() {
     matchedRootUris,
     error,
     totalMatches,
+    totalMistakes,
     wrongSelection,
     currentPage,
     isPageComplete,

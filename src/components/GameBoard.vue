@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GamePage } from "../types"
+import type { GamePage, GameMode } from "../types"
 import { useI18n } from "../composables/useI18n"
 import PostCard from "./PostCard.vue"
 
@@ -13,6 +13,7 @@ defineProps<{
   wrongSelection: string | null
   score: number
   timeRemaining: number
+  gameMode: GameMode
   progress: { current: number; total: number }
   handle: string
 }>()
@@ -23,8 +24,8 @@ defineEmits<{
 }>()
 
 function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
+  const m = Math.floor(Math.abs(seconds) / 60)
+  const s = Math.abs(seconds) % 60
   return `${m}:${s.toString().padStart(2, "0")}`
 }
 </script>
@@ -34,7 +35,13 @@ function formatTime(seconds: number): string {
     <header class="game-header">
       <span class="game-header__handle">@{{ handle }}</span>
       <span class="game-header__progress">{{ progress.current }} / {{ progress.total }}</span>
-      <span class="game-header__timer" :class="{ urgent: timeRemaining <= 15 }">
+      <span
+        class="game-header__timer"
+        :class="{ urgent: gameMode === 'time' && timeRemaining <= 15 }"
+      >
+        <template v-if="gameMode === 'challenge'">
+          <span class="game-header__timer-label">{{ t("game.elapsed") }}</span>
+        </template>
         {{ formatTime(timeRemaining) }}
       </span>
       <span class="game-header__score">{{ t("game.pts", { score }) }}</span>
@@ -107,6 +114,16 @@ function formatTime(seconds: number): string {
   color: var(--text-h);
   min-width: 60px;
   text-align: center;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.game-header__timer-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text);
+  font-family: var(--sans);
 }
 
 .game-header__timer.urgent {

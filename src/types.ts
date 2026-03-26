@@ -48,3 +48,29 @@ export interface GamePage {
 }
 
 export type GameState = "idle" | "loading" | "playing" | "gameOver"
+
+export type GameMode = "time" | "challenge"
+
+export type TimeDifficulty = "quick" | "moderate" | "long"
+export type ChallengeDifficulty = "easy" | "medium" | "hard" | "extreme"
+
+export interface GameConfig {
+  mode: GameMode
+  timeDifficulty?: TimeDifficulty
+  challengeDifficulty?: ChallengeDifficulty
+}
+
+export const TIME_LIMITS: Record<TimeDifficulty, number> = {
+  quick: 60,
+  moderate: 180,
+  long: 300,
+}
+
+export const CHALLENGE_COUNTS: Record<ChallengeDifficulty, number> = {
+  easy: 5,
+  medium: 10,
+  hard: 25,
+  extreme: 50,
+}
+
+export const MAX_REPLIES_PER_POST = 3

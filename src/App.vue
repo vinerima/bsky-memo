@@ -7,14 +7,17 @@ import LoadingSpinner from "./components/LoadingSpinner.vue"
 import GameBoard from "./components/GameBoard.vue"
 import GameOver from "./components/GameOver.vue"
 import type { Locale } from "./composables/useI18n"
+import type { GameConfig } from "./types"
 
 const { t, locale, setLocale, availableLocales } = useI18n()
 const { theme, toggleTheme } = useTheme()
 
 const {
   gameState,
+  gameMode,
   handle,
   score,
+  timer,
   timeRemaining,
   currentPage,
   selectedRootUri,
@@ -23,12 +26,17 @@ const {
   wrongSelection,
   error,
   totalMatches,
+  totalMistakes,
   progress,
   startGame,
   selectRoot,
   selectReply,
   resetGame,
 } = useGameState()
+
+function onStart(inputHandle: string, config: GameConfig) {
+  startGame(inputHandle, config)
+}
 
 function onLocaleChange(event: Event) {
   const target = event.target as HTMLSelectElement
@@ -72,7 +80,7 @@ function onLocaleChange(event: Event) {
       {{ error }}
     </div>
 
-    <HandleInput v-if="gameState === 'idle'" @start="startGame" />
+    <HandleInput v-if="gameState === 'idle'" @start="onStart" />
 
     <LoadingSpinner v-else-if="gameState === 'loading'" :message="t('app.loading')" />
 
@@ -85,6 +93,7 @@ function onLocaleChange(event: Event) {
       :wrongSelection="wrongSelection"
       :score="score"
       :timeRemaining="timeRemaining"
+      :gameMode="gameMode"
       :progress="progress"
       :handle="handle"
       @selectRoot="selectRoot"
@@ -95,7 +104,10 @@ function onLocaleChange(event: Event) {
       v-else-if="gameState === 'gameOver'"
       :score="score"
       :totalMatches="totalMatches"
+      :totalMistakes="totalMistakes"
       :handle="handle"
+      :gameMode="gameMode"
+      :elapsedTime="timer"
       @playAgain="resetGame"
     />
   </div>
