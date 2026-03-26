@@ -9,8 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.30",
-    "@atproto/api": "^0.19.4"
+    "vue": "^3.5.30"
   },
   "devDependencies": {
     "@types/node": "^24.12.0",
