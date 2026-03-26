@@ -1,4 +1,5 @@
 import type { BskyPost, FeedItem } from "../types"
+import { useI18n } from "./useI18n"
 
 const API_BASE = "https://public.api.bsky.app/xrpc"
 
@@ -12,6 +13,8 @@ async function apiGet<T>(path: string): Promise<T> {
 }
 
 export function useBlueskyApi() {
+  const { t } = useI18n()
+
   async function resolveHandle(handle: string): Promise<string> {
     const data = await apiGet<{ did: string }>(
       `com.atproto.identity.resolveHandle?handle=${encodeURIComponent(handle)}`
@@ -51,9 +54,7 @@ export function useBlueskyApi() {
     }
 
     if (posts.length < minPosts) {
-      throw new Error(
-        "This user doesn't have enough posts with replies to play the game. Try a more active account."
-      )
+      throw new Error(t("error.notEnoughPosts"))
     }
 
     return posts

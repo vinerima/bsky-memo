@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { GamePage } from "../types"
+import { useI18n } from "../composables/useI18n"
 import PostCard from "./PostCard.vue"
+
+const { t } = useI18n()
 
 defineProps<{
   currentPage: GamePage
@@ -34,17 +37,17 @@ function formatTime(seconds: number): string {
       <span class="game-header__timer" :class="{ urgent: timeRemaining <= 15 }">
         {{ formatTime(timeRemaining) }}
       </span>
-      <span class="game-header__score">{{ score }} pts</span>
+      <span class="game-header__score">{{ t("game.pts", { score }) }}</span>
     </header>
 
     <p class="game-hint">
-      <template v-if="!selectedRootUri">Select a post on the left to start matching</template>
-      <template v-else>Now select the replies that belong to the highlighted post</template>
+      <template v-if="!selectedRootUri">{{ t("game.hintSelect") }}</template>
+      <template v-else>{{ t("game.hintMatch") }}</template>
     </p>
 
     <div class="game-columns">
       <div class="game-column">
-        <h2>Posts</h2>
+        <h2>{{ t("game.posts") }}</h2>
         <PostCard
           v-for="post in currentPage.rootPosts"
           :key="post.uri"
@@ -56,7 +59,7 @@ function formatTime(seconds: number): string {
         />
       </div>
       <div class="game-column">
-        <h2>Replies</h2>
+        <h2>{{ t("game.replies") }}</h2>
         <PostCard
           v-for="reply in currentPage.shuffledReplies"
           :key="reply.uri"

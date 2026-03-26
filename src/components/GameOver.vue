@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from "../composables/useI18n"
+
+const { t } = useI18n()
+
 defineProps<{
   score: number
   totalMatches: number
@@ -12,13 +16,13 @@ defineEmits<{
 
 <template>
   <div class="game-over">
-    <h1>Time's Up!</h1>
+    <h1>{{ t("game.timesUp") }}</h1>
     <div class="game-over__score">{{ score }}</div>
-    <p class="game-over__label">points</p>
+    <p class="game-over__label">{{ t("game.points") }}</p>
     <p class="game-over__details">
-      You matched {{ totalMatches }} replies for @{{ handle }}
+      {{ t("game.matched", { count: totalMatches, handle }) }}
     </p>
-    <button class="play-again-btn" @click="$emit('playAgain')">Play Again</button>
+    <button class="play-again-btn" @click="$emit('playAgain')">{{ t("game.playAgain") }}</button>
   </div>
 </template>
 

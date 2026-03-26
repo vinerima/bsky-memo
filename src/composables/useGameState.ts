@@ -1,6 +1,7 @@
 import { ref, computed, onUnmounted } from "vue"
 import type { BskyPost, GamePage, GameState } from "../types"
 import { useBlueskyApi } from "./useBlueskyApi"
+import { useI18n } from "./useI18n"
 
 function shuffle<T>(array: T[]): T[] {
   const result = [...array]
@@ -39,6 +40,7 @@ function buildPages(postsWithReplies: Array<{ root: BskyPost; replies: BskyPost[
 
 export function useGameState() {
   const api = useBlueskyApi()
+  const { t } = useI18n()
 
   const gameState = ref<GameState>("idle")
   const handle = ref("")
@@ -116,9 +118,7 @@ export function useGameState() {
         .filter(({ replies }) => replies.length > 0)
 
       if (postsWithReplies.length < 3) {
-        throw new Error(
-          "Not enough posts with visible replies found. Try a more active account."
-        )
+        throw new Error(t("error.notEnoughReplies"))
       }
 
       pages.value = buildPages(postsWithReplies)
@@ -133,7 +133,7 @@ export function useGameState() {
       gameState.value = "playing"
       startTimer()
     } catch (e) {
-      error.value = e instanceof Error ? e.message : "An unexpected error occurred"
+      error.value = e instanceof Error ? e.message : t("error.unexpected")
       gameState.value = "idle"
     }
   }

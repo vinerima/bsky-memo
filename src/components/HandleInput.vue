@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue"
+import { useI18n } from "../composables/useI18n"
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   start: [handle: string]
@@ -17,10 +20,9 @@ function onSubmit() {
 
 <template>
   <div class="start-screen">
-    <h1>Bluesky Memo</h1>
+    <h1>{{ t("app.title") }}</h1>
     <p class="start-screen__subtitle">
-      Match replies to their original posts before time runs out.
-      Each correct match scores 10 points. You have 120 seconds.
+      {{ t("app.subtitle") }}
     </p>
 
     <form class="handle-form" @submit.prevent="onSubmit">
@@ -29,14 +31,14 @@ function onSubmit() {
         <input
           v-model="handle"
           type="text"
-          placeholder="username.bsky.social"
+          :placeholder="t('app.placeholder')"
           autocomplete="off"
           autocorrect="off"
           autocapitalize="off"
           spellcheck="false"
         />
       </div>
-      <button type="submit" :disabled="!handle.trim()">Start Game</button>
+      <button type="submit" :disabled="!handle.trim()">{{ t("app.start") }}</button>
     </form>
   </div>
 </template>
