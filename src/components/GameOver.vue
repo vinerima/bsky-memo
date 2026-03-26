@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from "vue"
 import type { GameMode } from "../types"
 import { useI18n } from "../composables/useI18n"
 
@@ -17,10 +18,39 @@ defineEmits<{
   playAgain: []
 }>()
 
+const copied = ref(false)
+const appUrl = import.meta.env.VITE_APP_URL || ""
+
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60)
   const s = seconds % 60
   return `${m}:${s.toString().padStart(2, "0")}`
+}
+
+function getShareText(): string {
+  const text = t("game.shareText", { score: props.score, count: props.totalMatches })
+  return appUrl ? `${text}\n${appUrl}` : text
+}
+
+async function share() {
+  const text = getShareText()
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ text })
+      return
+    } catch {
+      // User cancelled or share failed — fall through to clipboard
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(text)
+    copied.value = true
+    setTimeout(() => { copied.value = false }, 2000)
+  } catch {
+    // Clipboard unavailable
+  }
 }
 </script>
 
@@ -38,7 +68,17 @@ function formatTime(seconds: number): string {
     <p v-if="gameMode === 'challenge'" class="game-over__time">
       {{ t("game.inTime", { time: formatTime(elapsedTime) }) }}
     </p>
-    <button class="play-again-btn" @click="$emit('playAgain')">{{ t("game.playAgain") }}</button>
+
+    <div class="game-over__actions">
+      <button class="share-btn" @click="share">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        {{ copied ? t("game.copied") : t("game.share") }}
+      </button>
+      <button class="play-again-btn" @click="$emit('playAgain')">{{ t("game.playAgain") }}</button>
+    </div>
   </div>
 </template>
 
@@ -92,8 +132,32 @@ function formatTime(seconds: number): string {
   font-family: var(--mono);
 }
 
-.play-again-btn {
+.game-over__actions {
+  display: flex;
+  gap: 10px;
   margin-top: 32px;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  border: 2px solid var(--border);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.share-btn:hover {
+  border-color: var(--accent-border);
+}
+
+.play-again-btn {
   background: var(--accent);
   color: #fff;
   border: none;

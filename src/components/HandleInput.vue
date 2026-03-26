@@ -29,6 +29,7 @@ function onSubmit() {
 
 <template>
   <div class="start-screen">
+    <img src="/favicon.svg" alt="" class="start-screen__logo" width="64" height="64" />
     <h1>{{ t("app.title") }}</h1>
     <p class="start-screen__subtitle">
       {{ t("app.subtitle") }}
@@ -113,6 +114,10 @@ function onSubmit() {
   margin: 0 auto;
   padding: 24px;
   text-align: center;
+}
+
+.start-screen__logo {
+  margin-bottom: 8px;
 }
 
 .start-screen__subtitle {
