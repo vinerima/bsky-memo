@@ -54,7 +54,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "game.inTime": "in {time}",
     "game.playAgain": "Play Again",
     "game.share": "Share",
-    "game.shareText": "I scored {score} pts matching {count} replies on Bluesky Memo!",
+    "game.shareText": "I scored {score} pts matching {count} replies from @{handle} on Bluesky Memo!",
     "game.copied": "Copied to clipboard!",
 
     "error.notEnoughPosts": "This user doesn't have enough posts with replies to play the game. Try a more active account.",
@@ -105,7 +105,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "game.inTime": "in {time}",
     "game.playAgain": "Nochmal spielen",
     "game.share": "Teilen",
-    "game.shareText": "Ich habe {score} Pkt. erzielt und {count} Antworten bei Bluesky Memo zugeordnet!",
+    "game.shareText": "Ich habe {score} Pkt. erzielt und {count} Antworten von @{handle} bei Bluesky Memo zugeordnet!",
     "game.copied": "In die Zwischenablage kopiert!",
 
     "error.notEnoughPosts": "Dieser Nutzer hat nicht genug Posts mit Antworten für das Spiel. Versuche einen aktiveren Account.",
@@ -156,7 +156,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "game.inTime": "en {time}",
     "game.playAgain": "Rejouer",
     "game.share": "Partager",
-    "game.shareText": "J'ai obtenu {score} pts en associant {count} réponses sur Bluesky Memo !",
+    "game.shareText": "J'ai obtenu {score} pts en associant {count} réponses de @{handle} sur Bluesky Memo !",
     "game.copied": "Copié dans le presse-papiers !",
 
     "error.notEnoughPosts": "Cet utilisateur n'a pas assez de posts avec des réponses pour jouer. Essayez un compte plus actif.",
@@ -207,7 +207,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "game.inTime": "en {time}",
     "game.playAgain": "Jugar de nuevo",
     "game.share": "Compartir",
-    "game.shareText": "Conseguí {score} pts asociando {count} respuestas en Bluesky Memo!",
+    "game.shareText": "Conseguí {score} pts asociando {count} respuestas de @{handle} en Bluesky Memo!",
     "game.copied": "Copiado al portapapeles!",
 
     "error.notEnoughPosts": "Este usuario no tiene suficientes publicaciones con respuestas para jugar. Prueba con una cuenta más activa.",
