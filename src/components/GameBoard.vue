@@ -1,9 +1,21 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from "vue"
 import type { GamePage, GameMode } from "../types"
 import { useI18n } from "../composables/useI18n"
 import PostCard from "./PostCard.vue"
 
 const { t } = useI18n()
+
+const isSideBySide = ref(true)
+const mediaQuery = window.matchMedia("(min-width: 769px)")
+
+function onMediaChange(e: MediaQueryListEvent | MediaQueryList) {
+  isSideBySide.value = e.matches
+}
+
+onMediaChange(mediaQuery)
+onMounted(() => mediaQuery.addEventListener("change", onMediaChange))
+onUnmounted(() => mediaQuery.removeEventListener("change", onMediaChange))
 
 defineProps<{
   currentPage: GamePage
@@ -48,7 +60,7 @@ function formatTime(seconds: number): string {
     </header>
 
     <p class="game-hint">
-      <template v-if="!selectedRootUri">{{ t("game.hintSelect") }}</template>
+      <template v-if="!selectedRootUri">{{ t(isSideBySide ? "game.hintSelect" : "game.hintSelectStacked") }}</template>
       <template v-else>{{ t("game.hintMatch") }}</template>
     </p>
 
