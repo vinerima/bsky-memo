@@ -28,7 +28,7 @@ function formatTime(seconds: number): string {
 }
 
 function getShareText(): string {
-  const text = t("game.shareText", { score: props.score, count: props.totalMatches })
+  const text = t("game.shareText", { score: props.score, count: props.totalMatches, handle: props.handle })
   return appUrl ? `${text}\n${appUrl}` : text
 }
 
